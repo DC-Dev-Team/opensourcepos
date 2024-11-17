@@ -1572,8 +1572,15 @@ class Reports extends Secure_Controller
 		$report_data = $model->getData($inputs);
 
 		$tabular_data = array();
+
+		//get only data for the sales location for each user
+		$sales_location = $this->Stock_location->get_allowed_locations('sales');
 		foreach($report_data as $row)
 		{
+			if (!in_array($row['location_name'], $sales_location)) {
+				continue;
+			}
+
 			$tabular_data[] = $this->xss_clean(array(
 				'item_name' => $row['name'],
 				'item_number' => $row['item_number'],
@@ -1602,8 +1609,12 @@ class Reports extends Secure_Controller
 		$data = array();
 		$data['item_count'] = $model->getItemCountDropdownArray();
 
-		$stock_locations = $this->xss_clean($this->Stock_location->get_allowed_locations());
-		$stock_locations['all'] = $this->lang->line('reports_all');
+		$total_stock_locations = count($this->Stock_location->get_all()->result_array());
+
+		$stock_locations = $this->xss_clean($this->Stock_location->get_allowed_locations('sales'));
+		if ($total_stock_locations === count($this->Stock_location->get_allowed_locations('sales'))) {
+			$stock_locations['all'] = $this->lang->line('reports_all');
+		}
 		$data['stock_locations'] = array_reverse($stock_locations, TRUE);
 
 		$this->load->view('reports/inventory_summary_input', $data);

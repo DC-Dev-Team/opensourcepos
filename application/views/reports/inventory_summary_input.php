@@ -18,9 +18,27 @@ if(isset($error))
 
 	<div class="form-group form-group-sm">
 		<?php echo form_label($this->lang->line('reports_stock_location'), 'reports_stock_location_label', array('class'=>'required control-label col-xs-2')); ?>
-		<div id='report_stock_location' class="col-xs-3">
-			<?php echo form_dropdown('stock_location',$stock_locations,'all','id="location_id" class="form-control"'); ?>
-		</div>
+		<?php				
+		// Check if there is only two stock location containing all as the first key
+		if (
+			count($stock_locations) == 2 
+			&& array_key_exists('all', $stock_locations)
+			): 	
+			// Remove the 'all' option from the array
+			unset($stock_locations['all']);
+			// Get the single stock location key and value
+			$location_key = key($stock_locations);
+			$location_value = reset($stock_locations);
+		?>
+			<!-- Show the single stock location as a non-editable field -->
+			<input type="hidden" name="stock_location" value="<?php echo $location_key; ?>" id="location_id" />
+			<p class="form-control-static"><?php echo $location_value; ?></p>
+			<?php else: ?>
+			<div id='report_stock_location' class="col-xs-3">
+				<!-- Show the dropdown if there are multiple stock locations -->
+				<?php echo form_dropdown('stock_location', $stock_locations, 'all', array('id'=>'location_id', 'class'=>'form-control')); ?>
+			</div>
+		<?php endif; ?>
 	</div>
 
 	<div class="form-group form-group-sm">

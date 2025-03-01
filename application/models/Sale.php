@@ -210,9 +210,16 @@ class Sale extends CI_Model
 			}
 		}
 
-		if($filters['location_id'] != 'all')
+		// Checking if location filtering is required
+		if($filters && isset($filters['location_id']) && $filters['location_id'] != 'all')
 		{
-			$this->db->where('sales_items.item_location', $filters['location_id']);
+			if (is_array($filters['location_id'])) {
+				// Use where_in() to match any of the location IDs in the array
+				$this->db->where_in('sales_items.item_location', $filters['location_id']);
+			} else {
+				// If it's a single value
+				$this->db->where('sales_items.item_location', $filters['location_id']);
+			}
 		}
 
 		if($filters['only_invoices'] != FALSE)

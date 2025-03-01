@@ -70,6 +70,10 @@ class Sales extends Secure_Controller
 						 'only_invoices' => $this->config->item('invoice_enable') && $this->input->get('only_invoices'),
 						 'is_valid_receipt' => $this->Sale->is_valid_receipt($search));
 
+		// add users sales location in the filter
+		$sales_location = $this->Stock_location->get_allowed_locations('sales');
+		$filters['location_id'] = array_keys($sales_location);
+
 		// check if any filter is set in the multiselect dropdown
 		$filledup = array_fill_keys($this->input->get('filters'), TRUE);
 		$filters = array_merge($filters, $filledup);

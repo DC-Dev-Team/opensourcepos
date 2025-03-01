@@ -1569,6 +1569,9 @@ class Reports extends Secure_Controller
 		$this->load->model('reports/Inventory_low');
 		$model = $this->Inventory_low;
 
+		//get only data for the sales location for each user
+		$sales_location = $this->Stock_location->get_allowed_locations('sales');
+		$inputs['location_id'] = array_keys($sales_location);
 		$report_data = $model->getData($inputs);
 
 		$tabular_data = array();

@@ -998,6 +998,9 @@ class Sale extends CI_Model
 			$payments[$this->lang->line('sales_credit_deposit')] = $this->lang->line('sales_credit_deposit');
 		}
 
+		// For bank transfers
+		$payments[$this->lang->line('sales_transfer')] = $this->lang->line('sales_transfer');
+
 		return $payments;
 	}
 

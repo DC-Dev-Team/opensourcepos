@@ -204,6 +204,7 @@ $lang["sales_taxed_ind"] = "T";
 $lang["sales_total"] = "Total";
 $lang["sales_total_tax_exclusive"] = "Tax excluded";
 $lang["sales_transaction_failed"] = "Sales Transaction failed.";
+$lang["sales_transfer"] = "Transfer";
 $lang["sales_unable_to_add_item"] = "Item add to Sale failed";
 $lang["sales_unsuccessfully_deleted"] = "Sale(s) delete failed.";
 $lang["sales_unsuccessfully_restored"] = "Sale(s) restore failed.";

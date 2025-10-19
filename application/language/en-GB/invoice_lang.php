@@ -1,0 +1,34 @@
+<?php
+$lang["invoice_create_invoice"] = "Create Invoice";
+$lang["invoice_view_invoice"] = "View Invoice";
+$lang["invoice_hq_review"] = "HQ Review";
+$lang["invoice_hq_review_description"] = "Review and approve/decline invoice requests from branches. Stock will only be deducted from HQ after approval.";
+$lang["invoice_date"] = "Invoice Date";
+$lang["invoice_branch"] = "Branch";
+$lang["invoice_add_item"] = "Add Item";
+$lang["invoice_item"] = "Item";
+$lang["invoice_quantity"] = "Quantity";
+$lang["invoice_unit_price"] = "Unit Price";
+$lang["invoice_total_price"] = "Total Price";
+$lang["invoice_stock"] = "Stock Available";
+$lang["invoice_actions"] = "Actions";
+$lang["invoice_notes"] = "Notes";
+$lang["invoice_invoice_id"] = "Invoice ID";
+$lang["invoice_status"] = "Status";
+$lang["invoice_created_by"] = "Created By";
+$lang["invoice_created_at"] = "Created At";
+$lang["invoice_fulfilled_at"] = "Fulfilled At";
+$lang["invoice_items"] = "Items";
+$lang["invoice_item_number"] = "Item Number";
+$lang["invoice_item_name"] = "Item Name";
+$lang["invoice_total_amount"] = "Total Amount";
+$lang["invoice_mark_fulfilled"] = "Mark as Fulfilled";
+$lang["invoice_no_items"] = "No items added to invoice";
+$lang["invoice_approve"] = "Approve Invoice";
+$lang["invoice_decline"] = "Decline Invoice";
+$lang["invoice_review"] = "Invoice Review";
+$lang["invoice_create"] = "Create Invoices";
+$lang["invoice_view"] = "View Invoices";
+$lang["common_cancel"] = "Cancel";
+$lang["common_back"] = "Back";
+?>

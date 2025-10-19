@@ -16,7 +16,7 @@ class Stock_location extends CI_Model
 
 	public function get_all()
 	{
-		$this->db->from('stock_locations');
+		$this->db->from('ospos_stock_locations');
 		$this->db->where('deleted', 0);
 
 		return $this->db->get();
@@ -24,9 +24,9 @@ class Stock_location extends CI_Model
 
 	public function get_undeleted_all($module_id = 'items')
 	{
-		$this->db->from('stock_locations');
-		$this->db->join('permissions AS permissions', 'permissions.location_id = stock_locations.location_id');
-		$this->db->join('grants AS grants', 'grants.permission_id = permissions.permission_id');
+		$this->db->from('ospos_stock_locations');
+		$this->db->join('ospos_permissions AS permissions', 'permissions.location_id = ospos_stock_locations.location_id');
+		$this->db->join('ospos_grants AS grants', 'grants.permission_id = permissions.permission_id');
 		$this->db->where('person_id', $this->session->userdata('person_id'));
 		$this->db->like('permissions.permission_id', $module_id, 'after');
 		$this->db->where('deleted', 0);

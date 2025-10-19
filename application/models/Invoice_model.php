@@ -280,7 +280,10 @@ class Invoice_model extends CI_Model
 		$this->db->where('item_id', $item_id);
 		
 		$result = $this->db->get()->row();
-		return $result ? (array)$result : array('unit_price' => 0);
+		if (!$result) {
+			return array('unit_price' => 0);
+		}
+		return (array)$result;
 	}
 
 	/**
@@ -296,20 +299,21 @@ class Invoice_model extends CI_Model
 		
 		$current_stock = $this->db->get()->row();
 		
-		if ($current_stock) {
-			// Update existing stock
-			$new_quantity = $current_stock->quantity - $quantity;
-			$this->db->where('item_id', $item_id);
-			$this->db->where('location_id', 1);
-			$this->db->update('ospos_item_quantities', array('quantity' => $new_quantity));
-		} else {
+		if (!$current_stock) {
 			// Insert new stock record (negative quantity)
 			$this->db->insert('ospos_item_quantities', array(
 				'item_id' => $item_id,
 				'location_id' => 1,
 				'quantity' => -$quantity
 			));
+			return;
 		}
+
+		// Update existing stock
+		$new_quantity = $current_stock->quantity - $quantity;
+		$this->db->where('item_id', $item_id);
+		$this->db->where('location_id', 1);
+		$this->db->update('ospos_item_quantities', array('quantity' => $new_quantity));
 	}
 
 	/**

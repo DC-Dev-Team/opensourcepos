@@ -114,17 +114,18 @@ class Invoice extends Secure_Controller
 		$this->load->model('Invoice_model');
 		$result = $this->Invoice_model->create_invoice($invoice_data);
 
-		if ($result) {
-			echo json_encode(array(
-				'success' => true,
-				'message' => 'Invoice request created successfully. Awaiting HQ approval before stock deduction.'
-			));
-		} else {
+		if (!$result) {
 			echo json_encode(array(
 				'success' => false,
 				'message' => 'Failed to create invoice. Please try again.'
 			));
+			return;
 		}
+
+		echo json_encode(array(
+			'success' => true,
+			'message' => 'Invoice request created successfully. Awaiting HQ approval before stock deduction.'
+		));
 	}
 
 	/**
@@ -197,11 +198,13 @@ class Invoice extends Secure_Controller
 		$this->load->model('Invoice_model');
 		$result = $this->Invoice_model->mark_fulfilled($invoice_id);
 		
-		if ($result) {
-			$this->session->set_flashdata('success', 'Invoice marked as fulfilled.');
-		} else {
+		if (!$result) {
 			$this->session->set_flashdata('error', 'Failed to mark invoice as fulfilled.');
+			redirect('invoice/review');
+			return;
 		}
+
+		$this->session->set_flashdata('success', 'Invoice marked as fulfilled.');
 		
 		redirect('invoice/review');
 	}
@@ -250,17 +253,18 @@ class Invoice extends Secure_Controller
 		
 		$result = $this->Invoice_model->approve_invoice($invoice_id, $this->session->userdata('person_id'));
 		
-		if ($result) {
-			echo json_encode(array(
-				'success' => true,
-				'message' => 'Invoice approved successfully. Stock has been deducted from HQ.'
-			));
-		} else {
+		if (!$result) {
 			echo json_encode(array(
 				'success' => false,
 				'message' => 'Failed to approve invoice. Please try again.'
 			));
+			return;
 		}
+
+		echo json_encode(array(
+			'success' => true,
+			'message' => 'Invoice approved successfully. Stock has been deducted from HQ.'
+		));
 	}
 
 	/**
@@ -284,17 +288,18 @@ class Invoice extends Secure_Controller
 		$reason = $this->input->post('reason') ?: '';
 		$result = $this->Invoice_model->decline_invoice($invoice_id, $this->session->userdata('person_id'), $reason);
 		
-		if ($result) {
-			echo json_encode(array(
-				'success' => true,
-				'message' => 'Invoice declined successfully.'
-			));
-		} else {
+		if (!$result) {
 			echo json_encode(array(
 				'success' => false,
 				'message' => 'Failed to decline invoice. Please try again.'
 			));
+			return;
 		}
+
+		echo json_encode(array(
+			'success' => true,
+			'message' => 'Invoice declined successfully.'
+		));
 	}
 
 }

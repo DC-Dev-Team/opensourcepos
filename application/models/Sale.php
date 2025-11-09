@@ -216,8 +216,10 @@ class Sale extends CI_Model
 			if (is_array($filters['location_id'])) {
 				// Use where_in() to match any of the location IDs in the array
 				$this->db->where_in('sales_items.item_location', $filters['location_id']);
-			} else {
-				// If it's a single value
+			}
+			
+			// If it's a single value
+			if (!is_array($filters['location_id'])) {
 				$this->db->where('sales_items.item_location', $filters['location_id']);
 			}
 		}
@@ -248,6 +250,16 @@ class Sale extends CI_Model
 		if($filters['only_check'] != FALSE)
 		{
 			$this->db->like('payments.payment_type', $this->lang->line('sales_check'));
+		}
+
+		if($filters['only_transfer'] != FALSE)
+		{
+			$this->db->like('payments.payment_type', $this->lang->line('sales_transfer'));
+		}
+
+		if($filters['only_debitcard'] != FALSE)
+		{
+			$this->db->like('payments.payment_type', $this->lang->line('sales_debit'));
 		}
 
 		// get_found_rows case
@@ -344,6 +356,11 @@ class Sale extends CI_Model
 			$this->db->like('payment_type', $this->lang->line('sales_due'));
 		}
 
+		if($filters['only_transfer'] != FALSE)
+		{
+			$this->db->like('payment_type', $this->lang->line('sales_transfer'));
+		}
+
 		if($filters['only_check'] != FALSE)
 		{
 			$this->db->like('payment_type', $this->lang->line('sales_check'));
@@ -352,6 +369,27 @@ class Sale extends CI_Model
 		if($filters['only_creditcard'] != FALSE)
 		{
 			$this->db->like('payment_type', $this->lang->line('sales_credit'));
+		}
+
+		if($filters['only_debitcard'] != FALSE)
+		{
+			$this->db->like('payment_type', $this->lang->line('sales_debit'));
+		}
+
+		// Checking if location filtering is required (same as in search method)
+		if($filters && isset($filters['location_id']) && $filters['location_id'] != 'all')
+		{
+			// Join with sales_items to filter by location
+			$this->db->join('sales_items', 'sales_items.sale_id = sales.sale_id', 'inner');
+			if (is_array($filters['location_id'])) {
+				// Use where_in() to match any of the location IDs in the array
+				$this->db->where_in('sales_items.item_location', $filters['location_id']);
+			}
+			
+			// If it's a single value
+			if (!is_array($filters['location_id'])) {
+				$this->db->where('sales_items.item_location', $filters['location_id']);
+			}
 		}
 
 		$this->db->group_by('payment_type');

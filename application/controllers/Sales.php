@@ -37,7 +37,18 @@ class Sales extends Secure_Controller
 				'only_due' => $this->lang->line('sales_due_filter'),
 				'only_check' => $this->lang->line('sales_check_filter'),
 				'only_creditcard' => $this->lang->line('sales_credit_filter'),
+				'only_debitcard' => $this->lang->line('sales_debit_filter'),
+				'only_transfer' => $this->lang->line('sales_transfer_filter'),
 				'only_invoices' => $this->lang->line('sales_invoice_filter'));
+
+			// Get allowed locations for the user
+			$allowed_locations = $this->Stock_location->get_allowed_locations('sales');
+			
+			// Sort locations in ascending order by name
+			asort($allowed_locations);
+			
+			// Always add "All" option at the top
+			$data['stock_locations'] = array('all' => $this->lang->line('reports_all')) + $allowed_locations;
 
 			$this->load->view('sales/manage', $data);
 		}
@@ -67,12 +78,22 @@ class Sales extends Secure_Controller
 						 'only_due' => FALSE,
 						 'only_check' => FALSE,
 						 'only_creditcard' => FALSE,
+						 'only_debitcard' => FALSE,
+						 'only_transfer' => FALSE,
 						 'only_invoices' => $this->config->item('invoice_enable') && $this->input->get('only_invoices'),
 						 'is_valid_receipt' => $this->Sale->is_valid_receipt($search));
 
-		// add users sales location in the filter
+		// Get location filter from request, or use all allowed locations
+		$selected_location = $this->input->get('location_id');
 		$sales_location = $this->Stock_location->get_allowed_locations('sales');
+		
+		// Use all allowed locations by default
 		$filters['location_id'] = array_keys($sales_location);
+		
+		// Use selected location if valid
+		if ($selected_location && $selected_location != 'all' && isset($sales_location[$selected_location])) {
+			$filters['location_id'] = array($selected_location);
+		}
 
 		// check if any filter is set in the multiselect dropdown
 		$filledup = array_fill_keys($this->input->get('filters'), TRUE);

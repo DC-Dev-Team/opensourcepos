@@ -926,7 +926,8 @@ class Reports extends Secure_Controller
 			'check' => $this->lang->line('sales_check'),
 			'credit' => $this->lang->line('sales_credit'),
 			'debit' => $this->lang->line('sales_debit'),
-			'invoices' => $this->lang->line('sales_invoice')
+			'invoices' => $this->lang->line('sales_invoice'),
+			'transfer' => $this->lang->line('sales_transfer')
 		);
 
 		return $payment_type;

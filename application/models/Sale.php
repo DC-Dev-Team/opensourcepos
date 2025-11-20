@@ -376,20 +376,68 @@ class Sale extends CI_Model
 			$this->db->like('payment_type', $this->lang->line('sales_debit'));
 		}
 
-		// Checking if location filtering is required (same as in search method)
-		if($filters && isset($filters['location_id']) && $filters['location_id'] != 'all')
+		// Checking if location filtering is required
+		// Use a subquery approach to avoid duplicate payments when sales have multiple items
+		// location_id is an array when filtering is needed (from controller)
+		$needs_location_filter = $filters && isset($filters['location_id']) && is_array($filters['location_id']) && count($filters['location_id']) > 0;
+		
+		if($needs_location_filter)
 		{
-			// Join with sales_items to filter by location
-			$this->db->join('sales_items', 'sales_items.sale_id = sales.sale_id', 'inner');
-			if (is_array($filters['location_id'])) {
-				// Use where_in() to match any of the location IDs in the array
-				$this->db->where_in('sales_items.item_location', $filters['location_id']);
+			// Build subquery SQL manually to avoid affecting main query builder
+			$subquery_where = array();
+			
+			// Apply date filter to subquery
+			$date_format_empty = empty($this->config->item('date_or_time_format'));
+			
+			if($date_format_empty)
+			{
+				$subquery_where[] = 'DATE(sales.sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
 			}
 			
-			// If it's a single value
-			if (!is_array($filters['location_id'])) {
-				$this->db->where('sales_items.item_location', $filters['location_id']);
+			if(!$date_format_empty)
+			{
+				$subquery_where[] = 'sales.sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date']));
 			}
+			
+			// Apply sale_type filter to subquery
+			if($filters['sale_type'] == 'sales')
+			{
+				$subquery_where[] = 'sales.sale_status = ' . COMPLETED;
+			}
+			
+			if($filters['sale_type'] == 'quotes')
+			{
+				$subquery_where[] = 'sales.sale_status = ' . SUSPENDED . ' AND sales.quote_number IS NOT NULL';
+			}
+			
+			if($filters['sale_type'] == 'returns')
+			{
+				$subquery_where[] = 'sales.sale_status = ' . COMPLETED;
+			}
+			
+			if($filters['sale_type'] == 'all')
+			{
+				$subquery_where[] = 'sales.sale_status = ' . COMPLETED;
+			}
+			
+			// Apply invoice filter to subquery
+			if($filters['only_invoices'] != FALSE)
+			{
+				$subquery_where[] = 'invoice_number IS NOT NULL';
+			}
+			
+			// Build location filter
+			$location_ids = array_map(array($this->db, 'escape'), $filters['location_id']);
+			$location_filter = 'sales_items.item_location IN (' . implode(',', $location_ids) . ')';
+			
+			// Build subquery SQL
+			// Explicitly exclude canceled sales (sale_status = CANCELED = 2)
+			$subquery_sql = 'SELECT DISTINCT sales.sale_id FROM ' . $this->db->dbprefix('sales') . ' AS sales 
+				INNER JOIN ' . $this->db->dbprefix('sales_items') . ' AS sales_items ON sales_items.sale_id = sales.sale_id 
+				WHERE ' . implode(' AND ', $subquery_where) . ' AND sales.sale_status != ' . CANCELED . ' AND ' . $location_filter;
+			
+			// Apply the subquery filter to main query
+			$this->db->where("sales.sale_id IN ($subquery_sql)", NULL, FALSE);
 		}
 
 		$this->db->group_by('payment_type');

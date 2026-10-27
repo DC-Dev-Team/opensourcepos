@@ -14,7 +14,9 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 # if in web root
-RewriteRule ^(.*)$ index.php?/$1 [L]
+# BCTLS: Apache >= 2.4.67 rejects raw spaces/control chars in the rewritten URL (AH10411),
+# e.g. report date ranges such as "2026-10-27 00:00:00".
+RewriteRule ^(.*)$ index.php?/$1 [L,BCTLS]
 
 # if in subdir comment above line, uncomment below one and replace <OSPOS path> with your path
 # RewriteRule ^(.*)$ /<OSPOS path>/public/index.php?/$1 [L]
